@@ -1,25 +1,32 @@
 [
     {
         "lineNumber": "1",
-        "format": "single",
+        "inputType": "single",
         "dataType": "int",
-        "valueLowerBound": "1",
-        "valueUpperBound": "1000"
+        "args": {
+            "valueLowerBound": "1",
+            "valueUpperBound": "1000"
+        }
     },
     {
         "lineNumber": "2",
-        "format": "single",
+        "inputType": "single",
         "dataType": "int",
-        "valueLowerBound": "1",
-        "valueUpperBound": "100000"
+        "args": {
+            "valueLowerBound": "1",
+            "valueUpperBound": "100000"
+        }
     },
     {
         "lineNumber": "2",
-        "format": "array",
+        "inputType": "array",
         "dataType": "int",
-        "count": "{n}",
-        "valueLowerBound": "1",
-        "valueUpperBound": "10000000",
-        "constraint": ["positive", "sorted_dec", "unique"]
+        "args": {
+            "count": "{n}",
+            "valueLowerBound": "1",
+            "valueUpperBound": "10000000",
+            "distribution": "random",
+            "constraint": ["positive", "sorted_dec", "unique"]
+        }
     }
 ]
