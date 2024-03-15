@@ -1,0 +1,25 @@
+[
+    {
+        "lineNumber": "1",
+        "format": "single",
+        "dataType": "int",
+        "valueLowerBound": "1",
+        "valueUpperBound": "1000"
+    },
+    {
+        "lineNumber": "2",
+        "format": "single",
+        "dataType": "int",
+        "valueLowerBound": "1",
+        "valueUpperBound": "100000"
+    },
+    {
+        "lineNumber": "2",
+        "format": "array",
+        "dataType": "int",
+        "count": "{n}",
+        "valueLowerBound": "1",
+        "valueUpperBound": "10000000",
+        "constraint": ["positive", "sorted_dec", "unique"]
+    }
+]
