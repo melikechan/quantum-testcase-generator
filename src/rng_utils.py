@@ -36,6 +36,12 @@ class RandomNumberGenerator:
     # Generate multiple random numbers in the range [l, r].
     # The number of random numbers to generate is specified by num_numbers.
     def get_random_number(self, l: int, r: int, num_numbers: int = 1) -> list:
+        if l > r:
+            raise Exception("Invalid range")
+
+        if l < -(2 ** (self.num_qubits - 1)) or r > 2 ** (self.num_qubits - 1) - 1:
+            raise Exception("Out of bounds")
+
         self.circ.h(self.qreg)
         self.circ.measure(self.qreg, self.creg)
 
