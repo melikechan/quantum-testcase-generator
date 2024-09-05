@@ -1,2 +1,4 @@
 qiskit
+qiskit-aer
+qiskit-aer-gpu
 qiskit-ibm-runtime
