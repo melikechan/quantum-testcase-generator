@@ -30,36 +30,48 @@ class TupleGenerator(BaseGenerator):
 
 
 class ArrayGenerator(BaseGenerator):
-    def __init__(self, l: int, r: int, num_numbers: int, sum_array: int):
+    def __init__(self, l: int, r: int, dimensions: list[int], sum_array: int = None):
         super().__init__()
         self.l = l
         self.r = r
-        self.num_numbers = num_numbers
+        self.dimensions = dimensions
         self.sum = sum_array
-        if self.sum < l * num_numbers or self.sum > r * num_numbers:
+
+        self.num_numbers = 1
+        for dimension in dimensions:
+            self.num_numbers *= dimension
+
+        if self.sum is not None and self.sum < l * self.num_numbers or self.sum > r * self.num_numbers:
             raise Exception("Invalid sum")
 
     def get_array(self) -> list:
         result = []
 
         result = self.rng.get_random_number(self.l, self.r, self.num_numbers)
-        current_sum = sum(result)
+
+        # Reshape the array
+        for dimension in reversed(self.dimensions):
+            result = [
+                result[i:i + dimension] for i in range(0, len(result), dimension)]
 
         # Adjust the numbers if needed
-        while current_sum != self.sum:
-            diff = self.sum - current_sum
-            if diff > 0:
-                index = self.rng.get_random_number(0, self.num_numbers - 1)[0]
-                result[index] += min(diff, self.r - result[index])
-            else:
-                index = self.rng.get_random_number(0, self.num_numbers - 1)[0]
-                result[index] += max(diff, self.l - result[index])
-                current_sum = sum(result)
-        print(sum(result), self.sum)
+        if self.sum is not None:
+            current_sum = sum(result)
+            while current_sum != self.sum:
+                diff = self.sum - current_sum
+                if diff > 0:
+                    index = self.rng.get_random_number(
+                        0, self.num_numbers - 1)[0]
+                    result[index] += min(diff, self.r - result[index])
+                else:
+                    index = self.rng.get_random_number(
+                        0, self.num_numbers - 1)[0]
+                    result[index] += max(diff, self.l - result[index])
+                    current_sum = sum(result)
 
 
 class GraphGenerator(BaseGenerator):
-    def __init__(self, n: int, m: int, weight: list[int], weight_sum: int = None,
+    def __init__(self, n: int, m: int, weight: list[int] = None, weight_sum: int = None,
                  directed: bool = False, cyclic: bool = False,
                  self_loops: bool = False, multi_edges: bool = False,
                  tree: bool = False):
@@ -241,6 +253,7 @@ class GraphGenerator(BaseGenerator):
                     edge_list.append((u, v, self.graph[u][v]))
 
         return edge_list
+
 
 class StringGenerator:
     # TODO

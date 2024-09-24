@@ -31,7 +31,7 @@ Format file is an array of objects, where each object represents a _single line_
         - `customChars` (list, required): The custom characters that can be used in the value.
   - `tuple`:
     - `valueCount` (int, required): The number of values in the tuple.
-    - `valueType` (list, required): The type of the values in the tuple. It can be a `single` or `array`.
+    - `valueType` (list, required): The type of the values in the tuple. It can be a `single`.
   - `array`:
     - `dimensionCount` (int, required): The number of dimensions in the array. (1 or 2)
     - `valueCount` (int, required): The number of values in the array.

@@ -1,32 +1,34 @@
 [
-    {
-        "lineNumber": "1",
-        "inputType": "single",
-        "dataType": "int",
-        "args": {
-            "valueLowerBound": "1",
-            "valueUpperBound": "1000"
-        }
-    },
-    {
-        "lineNumber": "2",
-        "inputType": "single",
-        "dataType": "int",
-        "args": {
-            "valueLowerBound": "1",
-            "valueUpperBound": "100000"
-        }
-    },
-    {
-        "lineNumber": "2",
-        "inputType": "array",
-        "dataType": "int",
-        "args": {
-            "count": "{n}",
-            "valueLowerBound": "1",
-            "valueUpperBound": "10000000",
-            "distribution": "random",
-            "constraint": ["positive", "sorted_dec", "unique"]
-        }
+  {
+    "lineNumber": "1",
+    "inputType": "single",
+    "dataType": "int",
+    "variableName": "t",
+    "args": {
+      "valueLowerBound": "1",
+      "valueUpperBound": "1000"
     }
+  },
+  {
+    "lineNumber": "2",
+    "inputType": "single",
+    "dataType": "int",
+    "variableName": "n",
+    "args": {
+      "valueLowerBound": "1",
+      "valueUpperBound": "100000"
+    }
+  },
+  {
+    "lineNumber": "2",
+    "inputType": "array",
+    "dataType": "int",
+    "args": {
+      "count": "{n}",
+      "valueLowerBound": "1",
+      "valueUpperBound": "10000000",
+      "distribution": "random",
+      "constraint": ["positive", "sorted_dec", "unique"]
+    }
+  }
 ]
