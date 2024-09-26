@@ -59,7 +59,8 @@ class RandomNumberGenerator:
         # Convert the results to integers and scale them to the desired range
         results = [
             (int(key[1:], 2) * (1 if key[0] == "0" else -1)) % (r - l + 1) + l
-            for key in result.get_counts().keys()
+            for (key, value) in result.get_counts().items()
+            for _ in range(value)
         ]
 
         return results
