@@ -1,7 +1,5 @@
 import rng_utils
 
-# Numeric Values
-
 
 class BaseGenerator:
     def __init__(self):
@@ -18,17 +16,6 @@ class SingleNumberGenerator(BaseGenerator):
         return self.rng.get_random_number(self.l, self.r)[0]
 
 
-class TupleGenerator(BaseGenerator):
-    def __init__(self, l: int, r: int, num_numbers: int):
-        super().__init__()
-        self.l = l
-        self.r = r
-        self.num_numbers = num_numbers
-
-    def get_tuple(self) -> list:
-        return self.rng.get_random_number(self.l, self.r, self.num_numbers)
-
-
 class ArrayGenerator(BaseGenerator):
     def __init__(self, l: int, r: int, dimensions: list[int], sum_array: int = None):
         super().__init__()
@@ -36,23 +23,26 @@ class ArrayGenerator(BaseGenerator):
         self.r = r
         self.dimensions = dimensions
         self.sum = sum_array
+        
+        if self.sum is not None and (self.sum < l * self.num_numbers or self.sum > r * self.num_numbers):
+            raise Exception("Invalid sum")
+
+    @property 
+    def dimensions(self) -> list[int]:
+        return self._dimensions
+    
+    @dimensions.setter
+    def dimensions(self, value: list[int]):
+        self._dimensions = value
 
         self.num_numbers = 1
-        for dimension in dimensions:
+        for dimension in value:
             self.num_numbers *= dimension
-
-        if self.sum is not None and self.sum < l * self.num_numbers or self.sum > r * self.num_numbers:
-            raise Exception("Invalid sum")
 
     def get_array(self) -> list:
         result = []
 
         result = self.rng.get_random_number(self.l, self.r, self.num_numbers)
-
-        # Reshape the array
-        for dimension in reversed(self.dimensions):
-            result = [
-                result[i:i + dimension] for i in range(0, len(result), dimension)]
 
         # Adjust the numbers if needed
         if self.sum is not None:
@@ -68,6 +58,14 @@ class ArrayGenerator(BaseGenerator):
                         0, self.num_numbers - 1)[0]
                     result[index] += max(diff, self.l - result[index])
                     current_sum = sum(result)
+
+        # Reshape the array
+        for dimension in reversed(self.dimensions):
+            result = [
+                result[i:i + dimension] for i in range(0, len(result), dimension)]
+        
+        result = result[0] if len(result) == 1 else result
+        return result
 
 
 class GraphGenerator(BaseGenerator):

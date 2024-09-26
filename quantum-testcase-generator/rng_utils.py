@@ -53,7 +53,8 @@ class RandomNumberGenerator:
         if self.cloud_mode:
             result = job.result(timeout=60)
         else:
-            result = job.result()[0].data.c0
+            result = job.result()[0].data.values()
+            result = list(result)[0]
 
         # Convert the results to integers and scale them to the desired range
         results = [

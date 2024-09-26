@@ -43,62 +43,93 @@ def main(args=None):
 
 def generate_testcases(inputfile, outputdir, test_case_count):
     input_parser = parser.Parser(inputfile)
-    data = input_parser.parse().sort(key=lambda x: x['lineNumber'])
-
-    # Singleton generators
-    single_number_generator = generators.SingleNumberGenerator(
-        l=-10**9, r=10**9)
-    tuple_generator = generators.TupleGenerator(
-        l=-10**9, r=10**9, num_numbers=2)
-    array_generator = generators.ArrayGenerator(
-        l=-10**9, r=10**9, num_numbers=5)
-    graph_generator = generators.GraphGenerator(n=0, m=0)
+    data = sorted(input_parser.parse_file(), key=lambda x: x['lineNumber'])
 
     for i in range(test_case_count):
         logging.info(f'Generating testcase {i+1}...')
 
+        single_number_generator = generators.SingleNumberGenerator(
+            l=-10**9, r=10**9)
+        array_generator = generators.ArrayGenerator(
+            l=-10**9, r=10**9, dimensions=[1], sum_array=None)
+        graph_generator = generators.GraphGenerator(n=0, m=0)
+
         variables = {}
-        outputfile = os.path.join(outputdir, f'testcase_{i+1}.txt')
+        outputfile_path = os.path.join(outputdir, f'testcase_{i+1}.txt')
         current_line = 1
-        for d in data:
-            while d['lineNumber'] > current_line:
-                os.write(outputfile, '\n')
-                current_line += 1
 
-            if d['type'] == 'single':
-                args = d['args']
+        with open(outputfile_path, 'w') as outputfile:
+            for d in data:
+                while d['lineNumber'] > current_line:
+                    outputfile.write('\n')
+                    current_line += 1
 
-                if d['dataType'] is None:
-                    data_type = 'int'
-                elif d['dataType'] not in ['int', 'float', 'str']:
-                    logging.error(f'Invalid data type {d["dataType"]}:')
-                    raise Exception('Invalid data type')
+                if d['inputType'] == 'single':
+                    generator_attributes = input_parser.parse_single_args(d)
+                    data_type = generator_attributes['data_type']
+
+                    if data_type == 'int' or data_type == 'float':
+                        lower_bound = generator_attributes['lower_bound']
+                        upper_bound = generator_attributes['upper_bound']
+
+                        lower_bound = variables[lower_bound] if lower_bound in variables else lower_bound
+                        upper_bound = variables[upper_bound] if upper_bound in variables else upper_bound
+
+                        single_number_generator.l = lower_bound
+                        single_number_generator.r = upper_bound
+                        variables[d['variableName']
+                                  ] = single_number_generator.get_number()
+                    else:
+                        # String generator not implemented yet
+                        raise NotImplementedError(
+                            'String generator is not implemented yet')
+
+                    outputfile.write(str(variables[d['variableName']]) + ' ')
+                elif d['inputType'] == 'array':
+                    generator_attributes = input_parser.parse_array_args(d)
+                    data_type = generator_attributes['data_type']
+
+                    if data_type == 'int' or data_type == 'float':
+                        lower_bound = generator_attributes['lower_bound']
+                        upper_bound = generator_attributes['upper_bound']
+                        dimensions = generator_attributes['dimensions']
+                        sum_elements = generator_attributes['sum_elements']
+
+                        # Replace variables
+                        for i in range(len(dimensions)):
+                            if dimensions[i] in variables:
+                                dimensions[i] = variables[dimensions[i]]
+
+                        lower_bound = variables[lower_bound] if lower_bound in variables else lower_bound
+                        upper_bound = variables[upper_bound] if upper_bound in variables else upper_bound
+                        sum_elements = variables[sum_elements] if sum_elements in variables else sum_elements
+
+                        array_generator.l = lower_bound
+                        array_generator.r = upper_bound
+                        array_generator.dimensions = dimensions
+                        array_generator.sum = sum_elements
+
+                        variables[d['variableName']
+                                  ] = array_generator.get_array()
+                    else:
+                        # String generator not implemented yet
+                        raise NotImplementedError(
+                            'String generator is not implemented yet')
+
+                    for row in range(len(variables[d['variableName']])):
+                        outputfile.write(' '.join(
+                            map(str, variables[d['variableName']][row])))
+
+                        if row != len(variables[d['variableName']]) - 1:
+                            outputfile.write('\n')
+
+                elif d['inputType'] == 'graph':
+                    pass
                 else:
-                    data_type = d['dataType']
+                    logging.error(f'Invalid type {d["inputType"]}')
+                    raise Exception('Invalid type')
 
-                if data_type != 'str':
-                    lower_bound = args['valueLowerBound']
-                    upper_bound = args['valueUpperBound']
-
-                    variables[d['name']] = single_number_generator.generate(
-                        data_type, lower_bound, upper_bound)
-                else:
-                    # Char generator not implemented yet
-                    raise NotImplementedError(
-                        'Char generator is not implemented yet')
-
-                os.write(outputfile, f'{variables[d["name"]]} ')
-            elif d['type'] == 'tuple':
-                pass
-            elif d['type'] == 'array':
-                pass
-            elif d['type'] == 'graph':
-                pass
-            else:
-                logging.error(f'Invalid type {d["type"]}')
-                raise Exception('Invalid type')
-
-        logging.info(f'Testcase {i+1} generated: {outputfile}')
+        logging.info(f'Testcase {i+1} generated: {outputfile_path}')
 
 
 if __name__ == '__main__':
