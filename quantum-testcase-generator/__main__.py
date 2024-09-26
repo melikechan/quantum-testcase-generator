@@ -43,7 +43,7 @@ def main(args=None):
 
 def generate_testcases(inputfile, outputdir, test_case_count):
     input_parser = parser.Parser(inputfile)
-    data = sorted(input_parser.parse_file(), key=lambda x: x['lineNumber'])
+    data = input_parser.parse_file()
 
     for i in range(test_case_count):
         logging.info(f'Generating testcase {i+1}...')
@@ -51,19 +51,14 @@ def generate_testcases(inputfile, outputdir, test_case_count):
         single_number_generator = generators.SingleNumberGenerator(
             l=-10**9, r=10**9)
         array_generator = generators.ArrayGenerator(
-            l=-10**9, r=10**9, dimensions=[1], sum_array=None)
+            l=-10**9, r=10**9)
         graph_generator = generators.GraphGenerator(n=0, m=0)
 
         variables = {}
         outputfile_path = os.path.join(outputdir, f'testcase_{i+1}.txt')
-        current_line = 1
 
         with open(outputfile_path, 'w') as outputfile:
             for d in data:
-                while d['lineNumber'] > current_line:
-                    outputfile.write('\n')
-                    current_line += 1
-
                 if d['inputType'] == 'single':
                     generator_attributes = input_parser.parse_single_args(d)
                     data_type = generator_attributes['data_type']
@@ -124,11 +119,14 @@ def generate_testcases(inputfile, outputdir, test_case_count):
                             outputfile.write('\n')
 
                 elif d['inputType'] == 'graph':
-                    pass
+                    raise NotImplementedError(
+                        'Graph handling is not implemented yet')
                 else:
                     logging.error(f'Invalid type {d["inputType"]}')
                     raise Exception('Invalid type')
 
+                if d['skipToNextLine']:
+                    outputfile.write('\n')
         logging.info(f'Testcase {i+1} generated: {outputfile_path}')
 
 

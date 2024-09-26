@@ -1,6 +1,6 @@
 [
   {
-    "lineNumber": 1,
+    "skipToNextLine": true,
     "inputType": "single",
     "dataType": "int",
     "variableName": "t",
@@ -10,7 +10,7 @@
     }
   },
   {
-    "lineNumber": 2,
+    "skipToNextLine": true,
     "inputType": "single",
     "dataType": "int",
     "variableName": "n",
@@ -20,12 +20,25 @@
     }
   },
   {
-    "lineNumber": 3,
+    "skipToNextLine": true,
     "inputType": "array",
     "dataType": "int",
     "variableName": "a",
     "args": {
       "dimensions": ["n", 1],
+      "valueLowerBound": 1,
+      "valueUpperBound": 1000,
+      "sumElements": 1000,
+      "constraints": ["positive", "sorted_dec", "unique"]
+    }
+  },
+  {
+    "skipToNextLine": false,
+    "inputType": "array",
+    "dataType": "int",
+    "variableName": "b",
+    "args": {
+      "dimensions": ["n", 2],
       "valueLowerBound": 1,
       "valueUpperBound": 1000,
       "constraints": ["positive", "sorted_dec", "unique"]

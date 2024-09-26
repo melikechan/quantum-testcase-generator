@@ -1,4 +1,5 @@
 import rng_utils
+import random
 
 
 class BaseGenerator:
@@ -17,20 +18,15 @@ class SingleNumberGenerator(BaseGenerator):
 
 
 class ArrayGenerator(BaseGenerator):
-    def __init__(self, l: int, r: int, dimensions: list[int], sum_array: int = None):
+    def __init__(self, l: int, r: int):
         super().__init__()
         self.l = l
         self.r = r
-        self.dimensions = dimensions
-        self.sum = sum_array
-        
-        if self.sum is not None and (self.sum < l * self.num_numbers or self.sum > r * self.num_numbers):
-            raise Exception("Invalid sum")
 
-    @property 
+    @property
     def dimensions(self) -> list[int]:
         return self._dimensions
-    
+
     @dimensions.setter
     def dimensions(self, value: list[int]):
         self._dimensions = value
@@ -39,31 +35,46 @@ class ArrayGenerator(BaseGenerator):
         for dimension in value:
             self.num_numbers *= dimension
 
+    @property
+    def sum(self) -> int:
+        return self._sum
+
+    @sum.setter
+    def sum(self, value: int):
+        self._sum = value
+
+        if value is not None and (value < self.l * self.num_numbers or value > self.r * self.num_numbers):
+            raise Exception("Invalid sum")
+
     def get_array(self) -> list:
         result = []
 
         result = self.rng.get_random_number(self.l, self.r, self.num_numbers)
+        not_used_indices = set(range(self.num_numbers))
 
         # Adjust the numbers if needed
         if self.sum is not None:
             current_sum = sum(result)
             while current_sum != self.sum:
                 diff = self.sum - current_sum
+                index = random.choice(list(not_used_indices))
+
+                not_used_indices.remove(index)
+
+                previous_val = result[index]
+
                 if diff > 0:
-                    index = self.rng.get_random_number(
-                        0, self.num_numbers - 1)[0]
                     result[index] += min(diff, self.r - result[index])
                 else:
-                    index = self.rng.get_random_number(
-                        0, self.num_numbers - 1)[0]
                     result[index] += max(diff, self.l - result[index])
-                    current_sum = sum(result)
+
+                current_sum += result[index] - previous_val
 
         # Reshape the array
         for dimension in reversed(self.dimensions):
             result = [
                 result[i:i + dimension] for i in range(0, len(result), dimension)]
-        
+
         result = result[0] if len(result) == 1 else result
         return result
 

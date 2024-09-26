@@ -10,7 +10,7 @@ Format file is an array of objects, where each object represents a _single line_
 
 ### Fields of the object
 
-- `lineNumber` (int, required): The line number of the input.
+- `skipToNextLine` (bool, required): Whether to skip to the next line after this group or not.
 - `inputType` (string, required): The type of the input. It can be one of the following:
   - `single`: A single value.
   - `array`: An array of values. (1-D or 2-D)
@@ -28,6 +28,15 @@ Format file is an array of objects, where each object represents a _single line_
       - `special`: Special characters (`!@#$%^&*()_+`)
       - `custom`: Custom characters, if used, then `customChars` is required.
         - `customChars` (list, required): The custom characters that can be used in the value.
+  - `array`:
+    - `dimensions` (list, required): The dimensions of the array.
+    - `valueLowerBound` (int, required): The lower bound of the value.
+    - `valueUpperBound` (int, required): The upper bound of the value.
+    - `constraints`:
+      - `unique`: All the values in the array should be unique.
+      - `sorted_desc`: The values in the array should be sorted.
+      - `sorted_asc`: The values in the array should be sorted in ascending order.
+      Note: `sorted_desc` and `sorted_asc` can not be used together. (mutually exclusive)
   - `graph`:
     - `nodeLowerBound` (int, required): The lower bound of the number of nodes.
     - `nodeUpperBound` (int, required): The upper bound of the number of nodes.
