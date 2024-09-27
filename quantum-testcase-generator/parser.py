@@ -9,7 +9,7 @@ class Parser:
     def parse_file(self) -> list:
         with open(self.input_file, 'r') as file:
             data = json.load(file)
-            
+
             return data
 
     def parse_single_args(self, data: dict) -> dict:
@@ -36,8 +36,6 @@ class Parser:
     def parse_array_args(self, data: dict) -> dict:
         args = data['args']
 
-        dimensions = args['dimensions']
-
         if data['dataType'] is None:
             data_type = 'int'
         elif data['dataType'] not in ['int', 'float', 'str']:
@@ -54,9 +52,33 @@ class Parser:
 
         return {
             'data_type': data_type,
-            'dimensions': dimensions,
             'lower_bound': lower_bound,
             'upper_bound': upper_bound,
             'sum_elements': sum_elements,
             'constraints': constraints
+        }
+
+    def parse_graph_args(self, data: dict) -> dict:
+        args = data['args']
+
+        weight_lower_bound = args['weightLowerBound'] if 'weightLowerBound' in args else None
+        weight_upper_bound = args['weightUpperBound'] if 'weightUpperBound' in args else None
+
+        is_directed = args['isDirected'] if 'isDirected' in args else False
+        is_weighted = args['isWeighted'] if 'isWeighted' in args else False
+
+        is_cyclic = True if 'cyclic' in args['constraints'] else False
+        is_tree = True if 'tree' in args['constraints'] else False
+        has_self_loops = True if 'self_loops' in args['constraints'] else False
+        has_multi_edges = True if 'multi_edges' in args['constraints'] else False
+
+        return {
+            'weight_lower_bound': weight_lower_bound,
+            'weight_upper_bound': weight_upper_bound,
+            'is_directed': is_directed,
+            'is_weighted': is_weighted,
+            'is_cyclic': is_cyclic,
+            'is_tree': is_tree,
+            'has_self_loops': has_self_loops,
+            'has_multi_edges': has_multi_edges
         }

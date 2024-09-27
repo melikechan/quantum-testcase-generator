@@ -24,8 +24,8 @@
     "inputType": "array",
     "dataType": "int",
     "variableName": "a",
+    "dimensions": ["n", 1],
     "args": {
-      "dimensions": ["n", 1],
       "valueLowerBound": 1,
       "valueUpperBound": 1000,
       "sumElements": 1000,
@@ -34,14 +34,17 @@
   },
   {
     "skipToNextLine": false,
-    "inputType": "array",
-    "dataType": "int",
+    "inputType": "graph",
     "variableName": "b",
+    "nodeCount": "n",
+    "edgeCount": 3232,
+    "outputMode": "edge_list",
     "args": {
-      "dimensions": ["n", 2],
-      "valueLowerBound": 1,
-      "valueUpperBound": 1000,
-      "constraints": ["positive", "sorted_dec", "unique"]
+      "weightLowerBound": 1,
+      "weightUpperBound": 1000,
+      "isDirected": false,
+      "isWeighted": true,
+      "constraints": ["multi_edges", "self_loops"]
     }
   }
 ]

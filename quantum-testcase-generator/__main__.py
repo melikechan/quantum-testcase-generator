@@ -52,7 +52,7 @@ def generate_testcases(inputfile, outputdir, test_case_count):
             l=-10**9, r=10**9)
         array_generator = generators.ArrayGenerator(
             l=-10**9, r=10**9)
-        graph_generator = generators.GraphGenerator(n=0, m=0)
+        graph_generator = generators.GraphGenerator(node_count=0, edge_count=0)
 
         variables = {}
         outputfile_path = os.path.join(outputdir, f'testcase_{i+1}.txt')
@@ -83,17 +83,18 @@ def generate_testcases(inputfile, outputdir, test_case_count):
                 elif d['inputType'] == 'array':
                     generator_attributes = input_parser.parse_array_args(d)
                     data_type = generator_attributes['data_type']
+                    
+                    dimensions = d['dimensions']
+
+                    # Replace variables
+                    for i in range(len(dimensions)):
+                        if dimensions[i] in variables:
+                            dimensions[i] = variables[dimensions[i]]
 
                     if data_type == 'int' or data_type == 'float':
                         lower_bound = generator_attributes['lower_bound']
                         upper_bound = generator_attributes['upper_bound']
-                        dimensions = generator_attributes['dimensions']
                         sum_elements = generator_attributes['sum_elements']
-
-                        # Replace variables
-                        for i in range(len(dimensions)):
-                            if dimensions[i] in variables:
-                                dimensions[i] = variables[dimensions[i]]
 
                         lower_bound = variables[lower_bound] if lower_bound in variables else lower_bound
                         upper_bound = variables[upper_bound] if upper_bound in variables else upper_bound
@@ -119,8 +120,59 @@ def generate_testcases(inputfile, outputdir, test_case_count):
                             outputfile.write('\n')
 
                 elif d['inputType'] == 'graph':
-                    raise NotImplementedError(
-                        'Graph handling is not implemented yet')
+                    generator_attributes = input_parser.parse_graph_args(d)
+
+                    node_count = variables[d['nodeCount']
+                                           ] if d['nodeCount'] in variables else d['nodeCount']
+                    edge_count = variables[d['edgeCount']
+                                           ] if d['edgeCount'] in variables else d['edgeCount']
+
+                    output_mode = d['outputMode']
+
+                    if output_mode not in ['adjacency_matrix', 'edge_list']:
+                        logging.error(f'Invalid output mode {output_mode}')
+                        raise Exception('Invalid output mode')
+
+                    graph_generator.node_count = node_count
+                    graph_generator.edge_count = edge_count
+
+                    graph_generator.directed = generator_attributes['is_directed']
+                    graph_generator.weighted = generator_attributes['is_weighted']
+                    graph_generator.self_loops = generator_attributes['has_self_loops']
+                    graph_generator.multi_edges = generator_attributes['has_multi_edges']
+                    graph_generator.cyclic = generator_attributes['is_cyclic']
+                    graph_generator.tree = generator_attributes['is_tree']
+
+                    weight_lower_bound = variables[generator_attributes['weight_lower_bound']
+                                                   ] if generator_attributes['weight_lower_bound'] in variables else generator_attributes['weight_lower_bound']
+                    weight_upper_bound = variables[generator_attributes['weight_upper_bound']
+                                                   ] if generator_attributes['weight_upper_bound'] in variables else generator_attributes['weight_upper_bound']
+
+                    graph_generator.weight = [
+                        weight_lower_bound, weight_upper_bound]
+
+                    graph_generator.build_graph()
+                    graph = graph_generator.get_graph(mode=output_mode)
+                    variables[d['variableName']] = graph
+
+                    if output_mode == 'adj_matrix':
+                        for row in range(len(graph)):
+                            outputfile.write(' '.join(
+                                map(str, graph[row])))
+
+                            if row != len(graph) - 1:
+                                outputfile.write('\n')
+                    elif output_mode == 'edge_list':
+                        for edge in graph:
+                            outputfile.write(f'{edge[0]} {edge[1]}')
+
+                            if graph_generator.weighted:
+                                outputfile.write(f' {edge[2]}')
+
+                            outputfile.write('\n')
+                    else:
+                        logging.error(f'Invalid output mode {output_mode}')
+                        raise Exception('Invalid output mode')
                 else:
                     logging.error(f'Invalid type {d["inputType"]}')
                     raise Exception('Invalid type')
